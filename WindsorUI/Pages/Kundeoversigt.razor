@@ -1,0 +1,113 @@
+﻿@page "/kundeoversigt"
+@attribute [Authorize]
+@inject ILagerSqlService Kunder
+    <!--her gør jeg brug af depend injektion som gør mine kundedata tilgængelige uden at skulle initaliserer properties -->
+
+    <head>
+        <link rel="stylesheet" type="text/css" href="/css/Salgsordre.css">
+    </head>
+    <h3>Kunde Oversigt</h3>
+
+    @if (kunde == null)
+    {
+        <h4>Loading...</h4>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-8">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Id</th>
+                            <th>KundeNummer</th>
+                            <th>Firma</th>
+                            <th>Adresse</th>
+                            <th>By</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var k in kunde)
+                        {
+                            <tr>
+                                <td>@k.Id</td>
+                                <td>@k.KundeID     </td>
+                                <td>@k.Firmanavn  </td>
+                                <td>@k.Adresse     </td>
+                                <td>@k.Bynavn  </td>
+                                <td>
+                                    <button class="btn btn-primary mx-2" @onclick="(() => Updatekunde(k.Id))">
+                                        Update
+                                    </button>
+                                    @if (idToDelete == k.Id)
+                                    {
+                                        <button class="btn btn-danger mx-2" @onclick="(() => SletProduktet(k.Id))">
+                                            Confirm Delete
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-danger mx-2" @onclick="(() => idToDelete = k.Id)">
+                                            Delete
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4">
+                @if (showEditForm) // viser siden Updatekunder hvor vi retter kundedata//
+                {
+                    <UpdateKunder Id="idToUpdate" OnUpdate="Opdatersiden"></UpdateKunder>// her overfører vi ID til UpdateKunder og vi opdaterer hvis event bliver aktiveret//
+                }
+
+            </div>
+        </div>
+
+    }
+
+    @code {
+        private List<IKunder> kunde;
+        private bool showEditForm = false;
+        private int idToUpdate = 0;
+        private int idToDelete = 0;
+
+        private void Updatekunde(int id)
+        {
+            idToUpdate = id;
+            showEditForm = true; 
+        }
+
+        private async Task SletProduktet(int id)
+        {
+            await Kunder.SletKunde(id);
+            kunde.Remove(kunde.Where(x => x.Id == id).FirstOrDefault()); // slet kunde hvis id er identisk med det valgte id som ønskes slettet
+            idToDelete = 0;
+        }
+
+        private void Opdatersiden(IKunder deb) // denne metode bruges til at genopfriske data efter data er opdateret i databasen
+        {
+            showEditForm = false;
+            
+            var p = kunde.Where(x => x.Id == deb.Id).FirstOrDefault();
+
+            if (p != null)  // jeg kunne her have brugt datamapper , men jeg ville gerne vise programmering fra scratc 
+            {
+                p.KundeID = deb.KundeID;
+                p.Firmanavn = deb.Firmanavn;
+                p.Adresse = deb.Adresse;
+                p.Bynavn = deb.Bynavn;
+            }
+
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            // her henter jeg mine kundeoplysninger async , således mine data ikke kollapser
+            kunde = await Kunder.HentKundeData();
+        }
+    }
+

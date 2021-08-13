@@ -1,0 +1,102 @@
+﻿div.gruppe1 
+{
+    position: fixed;
+    top: 350px;
+    left:300px;
+   width:300px;
+}
+div.gruppe2 {
+    position: fixed;
+    top: 350px;
+    left: 610px;
+    width: 300px;
+}
+div.gruppe3 {
+    position: fixed;
+    top: 200px;
+    left: 600px;
+    width: 300px;
+}
+div.gruppe4 {
+    position: fixed;
+    top: 200px;
+    left: 300px;
+    width: 300px;
+}
+div.gruppe5 {
+    position: fixed;
+    top: 270px;
+    left: 300px;
+    width: 450px;
+}
+div.gruppe6 {
+    position: fixed;
+    top: 600px;
+    left: 300px;
+    width: 200px;
+}
+h6 {
+    position: fixed;
+    top: 180px;
+    left: 300px;
+    width: 600px;
+    background-color: black;
+    color: red;
+}
+label,p {
+    background-color: black;
+    color: white;
+    width: 300px;
+}
+div.tabel1 {
+    position: fixed;
+    top: 180px;
+    left: 950px;
+    width: 900px;
+}
+div.tabel2 {
+    position: fixed;
+    top: 75px;
+    left: 300px;
+    width: 600px;
+}
+div.opretnyordre {
+    position: fixed;
+    top: 235px;
+    left: 650px;
+    width: 200px;
+}
+body{
+    background-color:darkgray;
+}
+.form-control{
+    background-color:khaki;
+}
+
+h6 {
+    position: fixed;
+    top: 180px;
+    left: 300px;
+    width: 600px;
+    height: 20px;
+    color:black;
+    background-color: red;
+    animation-name: example;
+    animation-duration: 4s;
+}
+#adresse {
+    position: fixed;
+    top: 75px;
+    left: 950px;
+    width: 900px;
+}
+
+@keyframes example {
+    from {
+        background-color: red;
+    }
+
+    to {
+        background-color: yellow;
+    }
+}

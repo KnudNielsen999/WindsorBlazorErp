@@ -1,0 +1,67 @@
+﻿@inject ILagerSqlService lagerdata
+
+
+<EditForm Model="@produkt" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Id</label>
+        <span>@produkt.ID</span>
+    </div>
+    <div class="form-group">
+        <label>Vare Nummer :</label>
+        <InputText @bind-Value="produkt.VareNummer" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Vare Tekst</label>
+        <InputText @bind-Value="produkt.VareTekst" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Mængde</label>
+        <InputNumber @bind-Value="produkt.Maengde" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Enheder</label>
+        <InputText @bind-Value="produkt.Enhed" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Cost pris</label>
+        <InputNumber @bind-Value="produkt.IndkobsPris" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Opr. Dato</label>
+        <InputDate @bind-Value="produkt.OprDT" class="form-control" />
+    </div>
+    
+    <button class="btn btn-primary" type="submit">Opdater produkt nummer</button>
+</EditForm>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public EventCallback<ILagerModel> UpdateProdukt { get; set; }
+
+    private ILagerModel produkt = new DisplayLagerModel();
+
+    private async Task HandleValidSubmit()
+    {
+        await lagerdata.OpdaterProdukt(produkt);
+        await UpdateProdukt.InvokeAsync(produkt);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var p = await lagerdata.HentETProdukt(Id);
+
+        produkt.ID = p.ID;
+        produkt.VareNummer = p.VareNummer;
+        produkt.VareTekst = p.VareTekst;
+        produkt.Maengde = p.Maengde;
+        produkt.Enhed = p.Enhed;
+        produkt.IndkobsPris = p.IndkobsPris;
+        produkt.OprDT = p.OprDT;
+    }
+}
+

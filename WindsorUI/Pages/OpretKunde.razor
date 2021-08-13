@@ -1,0 +1,51 @@
+﻿@page "/opretkunde"
+@attribute [Authorize(Roles = "Ansvarlig")]
+@inject ILagerSqlService Debitor
+
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/Salgsordre.css">
+</head>
+<h3>OpretVareNummer</h3>
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="@Kunde" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+           
+
+            <div class="form-group">
+                <label>KundeID/tlf nummer :</label>
+                <InputText @bind-Value="Kunde.KundeID" class="form-control" />
+                <ValidationMessage For="()=>Kunde.KundeID"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <label>Firma navn :</label>
+                <InputText @bind-Value="Kunde.Firmanavn" class="form-control" />
+                <ValidationMessage For="()=>Kunde.Firmanavn"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <label>Adresse :</label>
+                <InputText @bind-Value="Kunde.Adresse" class="form-control" />
+                <ValidationMessage For="()=>Kunde.Adresse"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <label>By navn :</label>
+                <InputText @bind-Value="Kunde.Bynavn" class="form-control" />
+                <ValidationMessage For="()=>Kunde.Bynavn"></ValidationMessage>
+            </div>
+            <button class="btn btn-primary" type="submit">Opret Kunde</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private IKunder Kunde = new DisplayKunder(); // jeg bruger DisplayKunder til at validerer mine data fra input fra skærm 
+
+
+    private async Task HandleValidSubmit()
+    {
+        await Debitor.OpretKunde(Kunde);
+        Kunde = new DisplayKunder();
+    }
+}
+

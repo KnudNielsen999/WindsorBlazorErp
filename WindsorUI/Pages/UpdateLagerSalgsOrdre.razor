@@ -1,0 +1,76 @@
+﻿@inject ILagerSqlService LagersalgOversigt
+
+<EditForm Model="@Salgoversigt" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Id</label>
+        <span>@Salgoversigt.ID</span>
+    </div>
+    <div class="form-group">
+        <label>Ordrenummer :</label>
+        <InputNumber @bind-Value="Salgoversigt.OrdreNummer" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Varenummer</label>
+        <InputText @bind-Value="Salgoversigt.VareNummer" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Mængde</label>
+        <InputNumber @bind-Value="Salgoversigt.IndkoebMaengde" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Pris</label>
+        <InputNumber @bind-Value="Salgoversigt.IndkobsPris" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Ordre opr.</label>
+        <InputDate @bind-Value="Salgoversigt.OrdreOprettet" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>KundeID</label>
+        <InputText @bind-Value="Salgoversigt.KundeID" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Bet. betingelser</label>
+        <InputText @bind-Value="Salgoversigt.Betalingsfrist" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Faktura tekst</label>
+        <InputText @bind-Value="Salgoversigt.FakturaTekst" class="form-control" />
+    </div>
+    <button class="btn btn-primary" type="submit">Opdater produkt nummer</button>
+</EditForm>
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public EventCallback<ILagerSalgModel> UpdateOrdre { get; set; }
+
+    private ILagerSalgModel Salgoversigt = new DisplayLagerSalgModel();
+
+    private async Task HandleValidSubmit()
+    {
+        await LagersalgOversigt.OpdaterLagerSalgsOrdre(Salgoversigt);
+        await UpdateOrdre.InvokeAsync(Salgoversigt);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var p = await LagersalgOversigt.HenteenOrdreData(Id);
+
+        Salgoversigt.ID = p.ID;
+        Salgoversigt.OrdreNummer = p.OrdreNummer;
+        Salgoversigt.VareNummer = p.VareNummer;
+        Salgoversigt.IndkoebMaengde = p.IndkoebMaengde;
+        Salgoversigt.IndkobsPris = p.IndkobsPris;
+        Salgoversigt.OrdreOprettet= p.OrdreOprettet;
+        Salgoversigt.KundeID= p.KundeID;
+        Salgoversigt.Betalingsfrist = p.Betalingsfrist;
+        Salgoversigt.FakturaTekst = p.FakturaTekst;
+
+    }
+}
+

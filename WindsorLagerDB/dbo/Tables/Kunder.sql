@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Kunder]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [KundeID] NVARCHAR(50) NOT NULL, 
+    [Firmanavn] NVARCHAR(50) NOT NULL, 
+    [Adresse] NVARCHAR(50) NOT NULL, 
+    [Bynavn] NVARCHAR(50) NOT NULL
+)

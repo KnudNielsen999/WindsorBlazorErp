@@ -1,0 +1,60 @@
+﻿@inject ILagerSqlService Kunder
+
+<EditForm Model="@deb" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label>Id</label>
+        <span>@deb.Id</span>
+    </div>
+    <div class="form-group">
+        <label>First Name</label>
+        <InputText @bind-Value="deb.KundeID" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Last Name</label>
+        <InputText @bind-Value="deb.Firmanavn" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Date of Birth</label>
+        <InputText @bind-Value="deb.Adresse" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label>Date of Birth</label>
+        <InputText @bind-Value="deb.Bynavn" class="form-control" />
+    </div>
+    <button class="btn btn-primary" type="submit">Update Person</button>
+</EditForm>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    [Parameter]
+    public EventCallback<IKunder> OnUpdate { get; set; }
+
+    private IKunder deb = new DisplayKunder();
+
+    private async Task HandleValidSubmit()
+    {
+        await Kunder.OpdaterKunde(deb);
+        await OnUpdate.InvokeAsync(deb);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var p = await Kunder.HentEenKunde(Id);
+
+        deb.Id = p.Id;
+        deb.KundeID = p.KundeID;
+        deb.Firmanavn = p.Firmanavn;
+        deb.Adresse = p.Adresse;
+        deb.Bynavn = p.Bynavn;
+    }
+
+
+
+}

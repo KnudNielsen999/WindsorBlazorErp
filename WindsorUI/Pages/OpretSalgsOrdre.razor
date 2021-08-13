@@ -1,0 +1,304 @@
+﻿@page "/opretsalgsordre"
+@inject ILagerSqlService SalgsOrdre
+@attribute [Authorize]
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/Salgsordre.css">
+</head>
+
+<div class="tabel1">
+
+    @if (ln == null)
+    {
+        <h4>Loading...</h4>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Varenummer</th>
+                            <th>Bestilte Enheder</th>
+                            <th>Salgs pris</th>
+                            <th>Linie Total</th>
+                            <th>Ordrenummer</th>
+
+                        </tr>
+                    </thead>
+
+
+
+                    <tbody>
+
+                        @foreach (var p in ln)
+                        {
+
+                            {
+                                <tr>
+                                    @if (nytordrenummer.Ordrenummer == p.OrdreNummer)
+                                    {
+                                        <td>@p.VareNummer</td>
+                                        <td>@p.IndkoebMaengde   </td>
+                                        <td>@p.IndkobsPris</td>
+                                        <td>@p.LinieTotal</td>
+                                        <td> @p.OrdreNummer</td>
+
+                                    }
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    }
+
+
+    @if (kunde == null)
+    {
+        <h4>Loading...</h4>
+    }
+    else
+    {
+        <div class="row" id="adresse">
+            <div class="col-lg-12">
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Firma</th>
+                            <th>Kunde nummer</th>
+                            <th>Adresse</th>
+                            <th>By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var k in kunde)
+                        {
+
+                            {
+                                <tr>
+                                    @if (k.KundeID == tempkunde || k.KundeID == Ordre.KundeID)
+                                    {
+                                        <td>@k.Firmanavn</td>
+                                        <td>@k.KundeID</td>
+                                        <td>@k.Adresse</td>
+                                        <td>@k.Bynavn</td>
+                                    }
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    }
+
+</div>
+
+<div class="tabel2">
+    <div class="row">
+        <div class="col-lg-12">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Varenummer</th>
+                        <th>Varetekst</th>
+                        <th>Indkøbs pris</th>
+                        <th>Lager Beholdning</th>
+                        <th>Enhed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (produkt != null)
+                    {
+                        <tr>
+                            <td>@produkt.VareNummer</td>
+                            <td>@produkt.VareTekst</td>
+                            <td>@produkt.IndkobsPris</td>
+                            <td>@produkt.Maengde</td>
+                            <td> @produkt.Enhed</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="row">
+    <div class="col-md-6 ">
+
+        <EditForm Model="@produkt" OnValidSubmit="HentLagerOpslag">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="container">
+                <div class="row ">
+                    <div class="gruppe4">
+                        <label> VareNummer :  </label>
+                        <InputText @bind-Value="produkt.VareNummer" class="form-control " />
+                    </div>
+                    <div class="gruppe5">
+                        <button class="btn btn-success" type="submit">Søg Vare</button>
+                    </div>
+                </div>
+            </div>
+
+        </EditForm>
+        <h6>@ordrebesked</h6>
+    </div>
+</div>
+
+
+
+
+<div class="row">
+    <div class="col-md-6 ">
+        <EditForm Model="@Ordre" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+           @*//*<ValidationSummary />//*@
+            <div class="gruppe1">
+                <div class="form-group">
+                    <label>Kunde ID (tlf nummer) :</label>
+                    <InputText @bind-Value="Ordre.KundeID" class="form-control" />
+                    <ValidationMessage For="()=>Ordre.KundeID"></ValidationMessage>
+                </div>
+                <div class="form-group">
+                    <label>Betalings betingelser :</label>
+                    <InputText @bind-Value="Ordre.Betalingsfrist" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Faktura text: </label>
+                    <InputText @bind-Value="Ordre.FakturaTekst" class="form-control" />
+                </div>
+                <div class="gruppe2">
+                    <div class="form-group">
+                        <label> VareNummer :  </label>
+                        <InputText @bind-Value="Ordre.VareNummer" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Antal enh.</label>
+                        <InputNumber @bind-Value="Ordre.IndkoebMaengde" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Pris :</label>
+                        <InputNumber @bind-Value="Ordre.IndkobsPris" class="form-control" />
+                    </div>
+                    <div class="gruppe6">
+                        <button class="btn btn-primary" type="submit">Godkend Salg</button>
+                    </div>
+                </div>
+            </div>
+        </EditForm>
+        <div class="gruppe3">
+            <p> Opret ny indkøbs ordre</p>
+        </div>
+        <div class="opretnyordre">
+            <button class="btn btn-primary" @onclick="OpretNyOrdreNummer">   OpretNytOrdreNummer</button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private ILagerSalgModel Ordre = new DisplayLagerSalgModel();
+    private ILagerModel produkt = new DisplayLagerModel();
+    private List<ILagerSalgModel> ln = new List<ILagerSalgModel>();
+    private IOrdreModel nytordrenummer = new DisplayOrdremodel();
+    private List<IKunder> kunde = new List<IKunder>();
+    string ordrebesked;
+    string tempkunde = "";
+
+
+    private async Task HentLagerOpslag()
+    {
+        ordrebesked = "";
+
+        produkt = await SalgsOrdre.HentVarenummer(produkt.VareNummer);
+
+        if (produkt == null) // jeg har lavet denne lille ting for at omgå null værdier
+        {
+            produkt = new DisplayLagerModel();
+            produkt.Enhed = "";
+            produkt.IndkobsPris = 0;
+            produkt.Maengde = 0;
+            produkt.OprDT = DateTime.Now;
+            produkt.VareNummer = "";
+            produkt.VareTekst = "ikke aktiv"; // hvis produktet har en null værdi sættes vareteksten til at være ikke aktiv , det kunne jeg også have //
+                                              // valgt med en variabel af typen bool
+            ordrebesked = "Varenummer ikke oprettet!";
+
+            return;
+
+        }
+
+        if (produkt.VareNummer != null)
+        {
+            Ordre.VareNummer = produkt.VareNummer;
+
+            if (Ordre.IndkoebMaengde >= produkt.Maengde) // her går jeg ind og checker om varen er disponibel ellers popper besked op om lagertal
+            {
+                ordrebesked = $"check lagertal  ordremængde = {Ordre.IndkoebMaengde} lagermængde ={produkt.Maengde}  ";
+            }
+
+
+        }
+
+
+    }
+
+
+
+
+    private async Task OpretNyOrdreNummer()
+    {
+        // her oprettes et nyt ordrenummer hvis det ønskes
+        nytordrenummer = await SalgsOrdre.HentOrdrenummer(1);
+        nytordrenummer.Ordrenummer += 1;
+        await SalgsOrdre.OpdaterOrdreNummer(nytordrenummer);
+        tempkunde = "";
+
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        Ordre.OrdreOprettet = DateTime.UtcNow; // fordi jeg bruger UTCNow tager jeg udgangspunkt i hvor på kloden jeg er placeret og ikke serveren
+        nytordrenummer = await SalgsOrdre.HentOrdrenummer(1);
+        Ordre.OrdreNummer = nytordrenummer.Ordrenummer;
+
+        Ordre.LinieTotal = Convert.ToDecimal(Ordre.IndkoebMaengde) * Ordre.IndkobsPris;
+        Ordre.FakturaTotal = Ordre.FakturaTotal + Ordre.LinieTotal;
+        produkt.Maengde -= Ordre.IndkoebMaengde;
+        await SalgsOrdre.OpdaterProdukt(produkt); // her opdateres produktet med det nye lagerantal efter ordreoprettelse
+        await SalgsOrdre.OpretSalgsOrdre(Ordre);  // her opdateres selve ordren med de relevante data
+        tempkunde = Ordre.KundeID; // jeg fanger lige kundeID inden Ordre nulstilles
+        Ordre = new DisplayLagerSalgModel();
+        ln = await SalgsOrdre.HentOrdreData();  // her genopfrisker vi lige siden med den nye ordrelinie
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ln = await SalgsOrdre.HentOrdreData(); // her hentes ordreoplysninger
+
+        var p = await SalgsOrdre.HentOrdrenummer(1); // her hentes sidst brugte ordrenummer
+
+        nytordrenummer.ID = p.ID;
+        nytordrenummer.Ordrenummer = p.Ordrenummer;
+
+        kunde = await SalgsOrdre.HentKundeData(); // her hentes kundeoplysninger
+
+    }
+
+
+}
+

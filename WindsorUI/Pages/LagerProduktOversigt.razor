@@ -1,0 +1,114 @@
+﻿@page "/LagerProduktOversigt"
+@inject ILagerSqlService lagerdata
+@using System.Linq
+@attribute [Authorize]
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/Salgsordre.css">
+</head>
+<h2>Produkt Oversigt</h2>
+
+@if (produkt == null)
+{
+    <h4>Loading...</h4>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-8">
+            <table class="table table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>Varenummer</th>
+                        <th>VareTekst</th>
+                        <th>Mængde</th>
+                        <th>Enhed</th>
+                        <th>Cost pris</th>
+                        <th>Opr. dato</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in produkt)
+                    {
+                        <tr>
+                            <td>@p.ID</td>
+                            <td>@p.VareNummer</td>
+                            <td>@p.VareTekst</td>
+                            <td>@p.Maengde</td>
+                            <td>@p.Enhed</td>
+                            <td>@p.IndkobsPris</td>
+                            <td>@p.OprDT</td>
+                            <td>
+                                <button class="btn btn-primary mx-2" @onclick="(() =>OpdaterProdukt(p.ID))">
+                                    Update
+                                </button>
+                                @if (idToDelete == p.ID)
+                                {
+                                    <button class="btn btn-danger mx-2" @onclick="(() => SletProduktet(p.ID))">
+                                        Confirm Delete
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-danger mx-2" @onclick="(() => idToDelete = p.ID)">
+                                        Delete
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            @if (showEditForm)
+            {
+                <UpdateLagerProdukt Id="@idToUpdate" UpdateProdukt="HandleOnUpdate"></UpdateLagerProdukt>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<ILagerModel> produkt;
+    private bool showEditForm = false;
+    private int idToUpdate = 0;
+    private int idToDelete = 0;
+
+    private void OpdaterProdukt(int id)
+    {
+        idToUpdate = id;
+        showEditForm = true;
+    }
+
+    private async Task SletProduktet(int id)
+    {
+        await lagerdata.SletProdukt(id);
+        produkt.Remove(produkt.Where(x => x.ID == id).FirstOrDefault());
+        idToDelete = 0;
+    }
+
+    private void HandleOnUpdate(ILagerModel lprodukt)
+    {
+        showEditForm = false;
+
+        var p = produkt.Where(x => x.ID == lprodukt.ID).FirstOrDefault();
+
+        if (p != null)
+        {
+            p.VareNummer = lprodukt.VareNummer;
+            p.VareTekst = lprodukt.VareTekst;
+            p.Maengde = lprodukt.Maengde;
+            p.Enhed = lprodukt.Enhed;
+            p.IndkobsPris = lprodukt.IndkobsPris;
+            p.OprDT = lprodukt.OprDT;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        produkt = await lagerdata.HentLagerData();
+    }
+}

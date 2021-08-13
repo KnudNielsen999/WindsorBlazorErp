@@ -1,0 +1,76 @@
+﻿
+@page "/opretvarenummer"
+@inject ILagerSqlService lagerdata 
+
+    <h3>OpretVareNummer</h3>
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm Model="@Lager" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label>VareNummer :</label>
+                    <InputText @bind-Value="Lager.VareNummer" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Vare Beskrivelse</label>
+                    <InputText @bind-Value="Lager.VareTekst" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Mængde :</label>
+                    <InputNumber @bind-Value="Lager.Maengde" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Enhed :  </label>
+                    <InputSelect @bind-Value="Lager.Enhed"class="form-control">
+                        <option value="">Vaelg Enhed...</option>
+                        <option value="1">Stk</option>
+                        <option value="2">Ltr</option>
+                        <option value="3">Kasse</option>
+                        <option value="4">Pose</option>
+                    </InputSelect>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Indkøbs pris: </label>
+                        <InputNumber @bind-Value="Lager.IndkobsPris" class="form-control" />
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">Opret Vare</button>
+            </EditForm>
+    </div>
+</div>
+
+@code {
+    private ILagerModel Lager = new DisplayLagerModel();
+
+    private async Task HandleValidSubmit()
+    {
+        if (Lager.Enhed!="")
+        {
+            if (Lager.Enhed=="1")
+            {
+                Lager.Enhed = "Stk";
+            }
+            else if (Lager.Enhed == "2")
+            {
+                Lager.Enhed = "LTR";
+            }
+            else if (Lager.Enhed == "3")
+            {
+                Lager.Enhed = "Kasse";
+            }
+            else if (Lager.Enhed == "4")
+            {
+                Lager.Enhed = "Pose";
+            }
+
+        }
+
+        Lager.OprDT = DateTime.Now;
+        await lagerdata.OpretVareNummer(Lager);
+        Lager = new DisplayLagerModel();
+    }
+}
